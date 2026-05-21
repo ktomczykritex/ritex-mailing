@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RITEX Smart Mailing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--bg2:#ffffff;--bg3:#faf9f7;--bg4:#f0eeea;
+  --border:#e4e1da;--border2:#d5d1c8;
+  --ink:#1c1b18;--ink2:#4a4740;--ink3:#9b9790;
+  --teal:#0f766e;--teal2:#0d9488;--teal-bg:#f0fdfa;--teal-border:#99f6e4;
+  --amber:#b45309;--amber-bg:#fffbeb;--amber-border:#fde68a;
+  --red:#dc2626;--red-bg:#fef2f2;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --blue:#1d4ed8;--blue-bg:#eff6ff;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;
+  --sans:'DM Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:6px;--r2:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.05);
+  --shadow2:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg4)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* LAYOUT */
+.app{display:block}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;border-bottom:1px solid var(--border);background:var(--bg2);gap:16px;box-shadow:var(--shadow);position:sticky;top:0;z-index:50}
+.cfg-bar{display:flex;align-items:center;gap:10px;padding:8px 24px;border-bottom:1px solid var(--border);background:var(--amber-bg);flex-wrap:wrap;position:sticky;top:56px;z-index:49}
+.cfg-bar.ok{background:var(--teal-bg);border-bottom-color:var(--teal-border)}
+.ctrl-bar{display:flex;align-items:center;gap:10px;padding:9px 24px;border-bottom:1px solid var(--border);background:var(--bg2);flex-wrap:wrap;position:sticky;top:90px;z-index:48}
+.content{display:grid;grid-template-columns:310px 1fr;align-items:start}
+
+/* TOPBAR */
+.logo-mark{font-family:var(--mono);font-size:16px;font-weight:600;color:var(--ink);letter-spacing:-.5px}
+.logo-mark em{color:var(--teal);font-style:normal}
+.logo-sub{font-size:10px;color:var(--ink3);font-family:var(--mono);letter-spacing:.6px;margin-top:2px}
+.date-input{font-family:var(--mono);font-size:12px;padding:6px 11px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg3);color:var(--ink);cursor:pointer;outline:none;transition:border-color .15s}
+.date-input:focus{border-color:var(--teal2);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+
+/* CFG BAR */
+.cfg-dot{width:7px;height:7px;border-radius:50%;background:var(--amber);flex-shrink:0}
+.cfg-bar.ok .cfg-dot{background:var(--teal2)}
+.cfg-label{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--amber)}
+.cfg-bar.ok .cfg-label{color:var(--teal)}
+.cfg-input{flex:1;min-width:220px;padding:6px 11px;border:1px solid var(--amber-border);border-radius:var(--r);background:var(--bg2);color:var(--ink);font-family:var(--mono);font-size:11px;outline:none}
+.cfg-input:focus{border-color:var(--teal2);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+
+/* BUTTONS */
+.btn{padding:6px 13px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg2);color:var(--ink2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn:hover{border-color:var(--teal2);color:var(--teal);background:var(--teal-bg)}
+.btn-teal{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600}
+.btn-teal:hover{background:var(--teal2);border-color:var(--teal2);color:#fff}
+.btn-teal:disabled{opacity:.45;cursor:not-allowed;background:var(--teal);color:#fff}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--ink3);font-size:11px;padding:5px 10px}
+.btn-ghost:hover{background:var(--red-bg);border-color:rgba(220,38,38,.2);color:var(--red)}
+.btn-stale{background:var(--amber-bg);border-color:var(--amber-border);color:var(--amber);font-size:11px;padding:4px 10px;font-family:var(--mono)}
+
+/* CTRL BAR */
+.ctrl-label{font-size:10px;font-family:var(--mono);color:var(--ink3);text-transform:uppercase;letter-spacing:.8px}
+.sp-select{padding:6px 26px 6px 11px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg2);color:var(--ink);font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239b9790'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;transition:border-color .15s}
+.sp-select:focus{border-color:var(--teal2);outline:none;box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+.stat-chip{font-family:var(--mono);font-size:11px;color:var(--ink3);background:var(--bg4);padding:4px 11px;border-radius:20px;border:1px solid var(--border);white-space:nowrap}
+.stat-chip em{color:var(--teal);font-style:normal;font-weight:600}
+.err-bar{padding:8px 24px;font-size:12px;font-family:var(--mono);color:var(--red);background:var(--red-bg);border-bottom:1px solid rgba(220,38,38,.15);display:none}
+.spin{display:inline-block;width:11px;height:11px;border:2px solid var(--border2);border-top-color:var(--teal);border-radius:50%;animation:rot .65s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* POOL */
+.pool{border-right:1px solid var(--border);background:var(--bg3);position:sticky;top:150px}
+.pool-head{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+.pool-title{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;color:var(--ink3)}
+.pool-count{font-family:var(--mono);font-size:11px;font-weight:600;background:var(--teal-bg);padding:2px 9px;border-radius:20px;color:var(--teal);border:1px solid var(--teal-border)}
+.pool-body{overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:7px;max-height:calc(100vh - 200px)}
+
+/* LOAD CARD */
+.lcard{border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px;background:var(--bg2);transition:all .2s;box-shadow:var(--shadow);animation:up .25s ease both}
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.lcard:hover{border-color:var(--border2);box-shadow:var(--shadow2);transform:translateY(-1px)}
+.lcard.sold{opacity:.38;background:var(--green-bg);border-color:var(--green-border);transform:none;box-shadow:none}
+.l-route{font-family:var(--mono);font-size:12px;font-weight:600}
+.l-tags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.tag{font-family:var(--mono);font-size:9px;font-weight:500;padding:2px 7px;border-radius:4px;letter-spacing:.3px}
+.tag-f{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.tag-t{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(29,78,216,.15)}
+.l-meta{font-size:11px;color:var(--ink3);margin-top:5px;line-height:1.6;font-family:var(--mono)}
+.l-price{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green);margin-top:4px}
+.l-act{margin-top:7px}
+.sold-btn{font-family:var(--mono);font-size:10px;font-weight:500;padding:3px 9px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--ink3);transition:all .15s}
+.sold-btn:hover{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+.lcard.sold .sold-btn{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+
+/* EMAIL PANEL */
+.email-panel{padding:16px 18px;display:flex;flex-direction:column;gap:13px;background:var(--bg)}
+
+/* GROUP CARD */
+.gc{border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--bg2);box-shadow:var(--shadow);animation:up .3s ease both}
+.gc.is-sent{order:999;opacity:0.6;}
+.gc-head{display:flex;align-items:center;gap:9px;padding:11px 15px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.gc-badge{font-family:var(--mono);font-size:10px;font-weight:600;padding:3px 9px;border-radius:4px;letter-spacing:.5px}
+.g1b{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.g2b{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(124,58,237,.2)}
+.g3b{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(29,78,216,.15)}
+.gc-title{font-size:13px;font-weight:600}
+.gc-time{font-family:var(--mono);font-size:10px;color:var(--ink3);background:var(--bg4);padding:3px 9px;border-radius:4px;border:1px solid var(--border);margin-left:auto;letter-spacing:.3px}
+.gc-body{padding:12px 15px;display:flex;flex-direction:column;gap:9px}
+.no-match{font-family:var(--mono);font-size:11px;color:var(--ink3);padding:8px 11px;background:var(--bg4);border-radius:var(--r);border:1px dashed var(--border2)}
+
+/* CARRIER BLOCK */
+.cblock{border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--bg3);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:7px}
+.cn{font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.cn-note{font-size:10px;color:var(--amber);font-family:var(--mono);background:var(--amber-bg);padding:1px 6px;border-radius:4px;border:1px solid var(--amber-border)}
+.cn-match{font-family:var(--mono);font-size:10px;color:var(--ink3)}
+.ch-right{display:flex;align-items:center;gap:5px}
+.lang-badge{font-family:var(--mono);font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;letter-spacing:.4px}
+.lang-toggle{display:flex;gap:2px;background:var(--bg3);border-radius:4px;padding:2px;border:1px solid var(--border)}
+.lang-btn{font-family:var(--mono);font-size:9px;font-weight:600;padding:3px 7px;border-radius:3px;border:none;background:transparent;color:var(--ink3);cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.lang-btn:hover{background:var(--bg4);color:var(--ink2)}
+.lang-btn.active{background:var(--teal);color:white}
+.lang-pl{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.lang-en{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(29,78,216,.15)}
+.time-badge{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--ink2);background:var(--bg2);padding:2px 8px;border-radius:4px;border:1px solid var(--border)}
+.cemail{font-family:var(--mono);font-size:10px;color:var(--blue);padding:5px 12px;border-bottom:1px solid var(--border);word-break:break-all;line-height:1.6;background:var(--blue-bg)}
+
+/* COPY ROW — NA GÓRZE, zawsze widoczne */
+.copy-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border);background:var(--bg2)}
+.cbtn{padding:8px 10px;font-family:var(--mono);font-size:10px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--teal);letter-spacing:.3px;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px}
+.cbtn:hover{background:var(--teal-bg)}
+.cbtn.send-btn{color:var(--teal);font-weight:600}
+.cbtn.send-btn:hover{background:var(--teal);color:#fff}
+.cbtn+.cbtn{border-left:1px solid var(--border)}
+
+.preview{padding:10px 12px;font-family:var(--mono);font-size:11px;white-space:pre-wrap;line-height:1.75;color:var(--ink2);background:var(--bg3)}
+
+/* EMPTY / MISC */
+.empty-s{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:13px}
+.empty-icon{font-size:40px}
+.empty-txt{font-family:var(--mono);font-size:11px;color:var(--ink3);text-align:center;line-height:1.8}
+.all-sold{display:flex;align-items:center;justify-content:center;padding:18px;background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--r2);font-family:var(--mono);font-size:12px;color:var(--green)}
+
+.sent-btn{font-family:var(--mono);font-size:10px;font-weight:500;padding:3px 9px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--ink3);transition:all .15s;margin-left:4px}
+.sent-btn:hover{border-color:var(--teal2);color:var(--teal);background:var(--teal-bg)}
+.sent-btn.is-sent{border-color:var(--teal2);color:var(--teal);background:var(--teal-bg)}
+.cblock.is-sent{background:var(--green-bg);border-color:var(--green-border);order:999;opacity:0.6;}
+.gc.is-sent{border-color:var(--green-border);background:var(--green-bg);}
+.auto-ind{font-family:var(--mono);font-size:10px;color:var(--ink3);margin-left:auto;opacity:.5;transition:opacity .3s}
+.notif-btn{font-family:var(--mono);font-size:11px;padding:5px 12px;border:1px solid var(--border);border-radius:var(--r);background:var(--bg2);color:var(--ink3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.notif-btn:hover{border-color:var(--teal2);color:var(--teal);background:var(--teal-bg)}
+.notif-btn.active{background:var(--teal-bg);border-color:var(--teal-border);color:var(--teal);font-weight:600}
+.notif-btn.denied{opacity:.4;cursor:not-allowed}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--ink);color:#fff;padding:9px 18px;border-radius:var(--r2);font-family:var(--mono);font-size:12px;box-shadow:0 8px 30px rgba(0,0,0,.18);transition:transform .3s cubic-bezier(.34,1.56,.64,1);z-index:999;pointer-events:none}
+.toast.on{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div>
+    <div class="logo-mark">RITEX <em>Smart</em> Mailing</div>
+    <div class="logo-sub">CONNECTED TO GOOGLE SHEETS · D-1</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="notif-btn" id="notifBtn" onclick="toggleNotif()">🔔 Powiadomienia</button>
+    <input type="date" class="date-input" id="dPick" onchange="onDateChange()">
+  </div>
+</div>
+
+<div class="cfg-bar" id="cfgBar">
+  <div class="cfg-dot"></div>
+  <span class="cfg-label" id="cfgLbl">APPS SCRIPT URL</span>
+  <input class="cfg-input" id="urlIn" placeholder="https://script.google.com/macros/s/.../exec">
+  <button class="btn" onclick="saveUrl()">Połącz</button>
+</div>
+
+<div class="ctrl-bar">
+  <span class="ctrl-label">Spedytor</span>
+  <select class="sp-select" id="sPick" onchange="onSpChange()">
+    <option value="">— wybierz —</option>
+    <option>EWA</option><option>KASIA</option><option>MAGDA</option><option>TOMEK</option>
+  </select>
+  <button class="btn btn-teal" id="lBtn" onclick="doLoad()">↓ Załaduj z Sheets</button>
+  <div class="stat-chip" id="stat" style="display:none"></div>
+  <!-- Wyczyść — zawsze widoczny gdy jest co czyścić -->
+  <button class="btn btn-ghost" id="clearBtn" onclick="clearCache()" style="display:none" title="Wyczyść pamięć podręczną dla tej daty">✕ Wyczyść cache</button>
+  <span class="auto-ind" id="autoInd" style="display:none">↻ auto-sync 10min</span>
+</div>
+<div class="err-bar" id="errDiv"></div>
+
+<div class="content">
+  <div class="pool">
+    <div class="pool-head">
+      <span class="pool-title">Dostępne ładunki</span>
+      <span class="pool-count" id="pCnt" style="display:none">0</span>
+    </div>
+    <div class="pool-body" id="pArea">
+      <div class="empty-s"><div class="empty-icon">📦</div><div class="empty-txt">Wybierz spedytora<br>i załaduj dane z Sheets</div></div>
+    </div>
+  </div>
+  <div class="email-panel" id="eArea">
+    <div class="empty-s"><div class="empty-icon">✉️</div><div class="empty-txt">Po załadowaniu ładunków<br>maile pojawią się tutaj</div></div>
+  </div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══ COPY STORE — bezpieczna alternatywa dla data-atrybutów ═══
+var CS={};var CI=0;
+function sc(v){var id='k'+(CI++);CS[id]=v;return id;}
+function dc(id){var v=CS[id];if(!v)return;navigator.clipboard.writeText(v).then(function(){showToast('Skopiowano!');});}
+
+// Otwiera Outlooka z gotowym mailem (TO lub BCC dla grup)
+function openOutlook(emailId, bodyId, subjectId, useBcc){
+  var emails=CS[emailId]||'';
+  var body=CS[bodyId]||'';
+  var subject=CS[subjectId]||'Ładunki';
+  // Outlook wymaga średników — zostawiamy ;, tylko usuwamy zbędne spacje
+  var emailList=emails.replace(/\s*;\s*/g,';').replace(/\s+/g,'');
+  // Buduj link — emaile NIE są kodowane, tylko subject i body
+  var params='subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  var link=useBcc
+    ?'mailto:?bcc='+emailList+'&'+params
+    :'mailto:'+emailList+'?'+params;
+  // Za długi link — wyślij bez treści i pokaż toast
+  if(link.length>32000){
+    showToast('Treść zbyt długa — wklej ręcznie po otwarciu Outlooka');
+    link=useBcc
+      ?'mailto:?bcc='+emailList+'&subject='+encodeURIComponent(subject)
+      :'mailto:'+emailList+'?subject='+encodeURIComponent(subject);
+  }
+  var a=document.createElement('a');
+  a.href=link;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// ═══ REGIONY ═══
+var RM={
+  'FR22':'BRETANIA','FR29':'BRETANIA','FR35':'BRETANIA','FR44':'BRETANIA',
+  'FR49':'BRETANIA','FR53':'BRETANIA','FR56':'BRETANIA','FR72':'BRETANIA',
+  'FR79':'BRETANIA','FR85':'BRETANIA',
+  'FR28':'PARYZ','FR45':'PARYZ','FR60':'PARYZ','FR75':'PARYZ',
+  'FR77':'PARYZ','FR78':'PARYZ','FR89':'PARYZ','FR91':'PARYZ',
+  // Bretania (3 subregiony z pliku)
+  'FR22':'BRETANIA','FR29':'BRETANIA','FR56':'BRETANIA',         // Górna
+  'FR44':'BRETANIA','FR85':'BRETANIA','FR49':'BRETANIA','FR79':'BRETANIA', // Dolna
+  'FR35':'BRETANIA','FR72':'BRETANIA','FR53':'BRETANIA',         // Środkowa
+  // Paryż
+  'FR60':'PARYZ','FR95':'PARYZ','FR91':'PARYZ','FR45':'PARYZ',
+  'FR28':'PARYZ','FR89':'PARYZ','FR77':'PARYZ','FR78':'PARYZ',
+  'FR75':'PARYZ','FR93':'PARYZ','FR94':'PARYZ','FR92':'PARYZ',
+  // Alzacja
+  'FR54':'ALZACJA','FR55':'ALZACJA','FR57':'ALZACJA',
+  'FR67':'ALZACJA','FR68':'ALZACJA','FR88':'ALZACJA',
+  // Północ
+  'FR02':'POLNOC','FR59':'POLNOC','FR62':'POLNOC','FR80':'POLNOC',
+  // Normandia
+  'FR14':'NORMANDIA','FR27':'NORMANDIA','FR50':'NORMANDIA','FR61':'NORMANDIA','FR76':'NORMANDIA',
+  // Środkowa (Dolina Loary)
+  'FR03':'SRODKOWA','FR18':'SRODKOWA','FR23':'SRODKOWA','FR36':'SRODKOWA',
+  'FR37':'SRODKOWA','FR41':'SRODKOWA','FR58':'SRODKOWA','FR86':'SRODKOWA','FR87':'SRODKOWA',
+  // Troyes (Szampania) — bez własnej listy TOP20, trafia do Grupy 3
+  'FR10':'TROYES','FR21':'TROYES','FR51':'TROYES','FR52':'TROYES','FR70':'TROYES',
+  // Lyon (Rodan-Alpy) — najbliżej Alzacji
+  'FR01':'LYON','FR25':'LYON','FR38':'LYON','FR39':'LYON','FR42':'LYON','FR43':'LYON','FR69':'LYON',
+  // Lazurowe (Prowansja) — najbliżej Alzacji
+  'FR04':'LAZUROWE','FR06':'LAZUROWE','FR07':'LAZUROWE','FR13':'LAZUROWE',
+  'FR26':'LAZUROWE','FR30':'LAZUROWE','FR83':'LAZUROWE','FR84':'LAZUROWE',
+  // Bordeaux (Akwitania) — zachodnia Francja, bliżej Bretanii
+  'FR16':'BORDEAUX','FR17':'BORDEAUX','FR33':'BORDEAUX'
+};
+function getRegion(country,code){
+  var c=(country||'').trim().toUpperCase();
+  var k=(code||'').trim().replace(/\s/g,'');
+  var digits=k.replace(/[^0-9]/g,'').slice(0,2);
+  var key=c+digits.padStart(2,'0');
+  if(RM[key])return RM[key];
+  if(c==='BE'||c==='NL'||c==='LU')return'BENELUX';
+  if(c==='DE')return'DE'+digits;
+  if(c==='FR')return'NIEPRZYPISANA';
+  if(c==='PL')return'PL';
+  return c||'?';
+}
+function isDE(r){return!!(r&&r.startsWith('DE'));}
+function getFrom(l){return getRegion(l.kraj_zal,l.kod_zal);}
+function getTo(l){var r=getRegion(l.kraj_rozl,l.kod_rozl);if(isDE(r))return'DE';if(r==='PL')return'POLNOC';return r;}
+
+// ═══ HARMONOGRAM ═══
+var CARRIERS={
+  EWA:[
+    {name:'Hoptrans (Paryż)',email:'logistics59@hoptrans.eu; logistics76@hoptrans.eu',time:'09:00',fromR:['PARYZ','NORMANDIA','SRODKOWA','POLNOC'],toR:['*']},
+    {name:'Transriva',email:'kristina.s@transriva.lt; augustas@transriva.lt',time:'09:00',fromR:['ALZACJA','LYON','LAZUROWE'],toR:['BENELUX']},
+    {name:'MDI',email:'arnold@mdi.lt',time:'09:20',fromR:['BRETANIA'],toDE_to:true,toR:['DE','ALZACJA']},
+    {name:'Finejas',email:'olga.kumelauske@finejas.lt',time:'10:20',fromR:['BRETANIA'],toDE_to:true,toR:['BENELUX','DE']}
+  ],
+  KASIA:[
+    {name:'United Transline',email:'kamile.silkaite@unitedtransline.lt',time:'09:40',fromR:['BRETANIA'],toR:['BENELUX','POLNOC']},
+    {name:'GBY',email:'m.zakarauskas@gby.lt; a.macuras@gby.lt; p.fromicius@gby.lt',time:'09:40',fromR:['BRETANIA'],toR:['BENELUX','POLNOC']},
+    {name:'Janas',email:'zbigniew.janas@janas-logistics.com; dawid.dziobko@janas-logistics.com',time:'10:00',fromR:['BRETANIA'],toDE_to:true,toR:['ALZACJA','DE']}
+  ],
+  MAGDA:[
+    {name:'Becker',email:'thorsten.laux@thyssenkrupp-steel.com',time:'09:00',fromR:['BRETANIA'],toR:['*']},
+    {name:'Haaf',email:'rpeters@haaf.de',time:'09:20',fromR:['BRETANIA'],toR:['ALZACJA']},
+    {name:'Marathon',email:'w.galazka@emarathon.eu',time:'10:40',fromR:['BRETANIA','PARYZ','ALZACJA','NORMANDIA','SRODKOWA','LYON','LAZUROWE','BORDEAUX','NIEPRZYPISANA'],toR:['*'],note:'JUMBO',maxTon:22},
+    {name:'Logisticevex',email:'daria.shkoloberda@evexlog.com',time:'11:00',fromR:['BRETANIA','PARYZ','ALZACJA','NORMANDIA','SRODKOWA','LYON','LAZUROWE','BORDEAUX','NIEPRZYPISANA'],toR:['*'],note:'JUMBO',maxTon:22}
+  ],
+  TOMEK:[
+    {name:'Hoptrans (DE)',email:'logistics27@hoptrans.eu',time:'09:00',fromDE_from:true,toR:['*']},
+    {name:'Roslitauto',email:'zygimantas@roslitauto.lt',time:'09:00',fromR:['PARYZ','NORMANDIA','SRODKOWA'],toR:['BENELUX','ALZACJA']},
+    {name:'Janas (DE)',email:'service@janas-logistics.com; zbigniew.janas@janas-logistics.com',time:'09:20',fromDE_from:true,toR:['FR-INNE','PARYZ','BRETANIA','ALZACJA','POLNOC','NORMANDIA','SRODKOWA','LYON','LAZUROWE','BORDEAUX']},
+    {name:'Henzel',email:'eryk.t@henzel.pl',time:'09:40',fromR:['PARYZ','NORMANDIA','SRODKOWA'],toDE_to:true,toR:['DE']}
+  ]
+};
+
+// ═══ NORMALIZACJA REGIONU DO NAJBLIŻSZEGO Z TOP20 ═══
+// Zwraca region dla TOP20 — null jeśli brak listy dla tego regionu
+// Regiony BEZ listy TOP20 → null → tylko Grupa 3
+function normalizeFromRegion(r){
+  if(r==='BRETANIA')return'BRETANIA';
+  if(r==='ALZACJA') return'ALZACJA';
+  if(r==='PARYZ')   return'PARYZ';
+  if(isDE(r))       return'DE';
+  // POLNOC, NORMANDIA, SRODKOWA, TROYES, LYON, LAZUROWE, BORDEAUX, FR-INNE, NIEPRZYPISANA
+  // → brak listy TOP20 → tylko Grupa 3
+  return null;
+}
+
+function matchCarrier(l,c){
+  var from=getFrom(l);var to=getTo(l);
+  // Filtr JUMBO — max tony
+  if(c.maxTon){var tony=parseFloat((l.tony||'').replace(',','.'));if(!isNaN(tony)&&tony>c.maxTon)return false;}
+  // Normalizuj region załadunku do najbliższego (TROYES/NORMANDIA/SRODKOWA → PARYZ, BORDEAUX → BRETANIA itd.)
+  var fromNorm=normalizeFromRegion(from);
+  // Filtr trasy — sprawdzamy oryginał i znormalizowany
+  var fromOk=c.fromDE_from
+    ? isDE(from)
+    : (c.fromR&&c.fromR.some(function(r){return r===from||r===fromNorm||r==='*';}));
+  if(!fromOk)return false;
+  if(c.toR[0]==='*')return true;
+  if(c.toDE_to)return c.toR.some(function(r){return r===to||r==='*'||(r==='DE'&&isDE(to));});
+  return c.toR.some(function(r){return r===to||r==='*';});
+}
+
+var TOP20={
+  'BRETANIA-BENELUX':'daniel.saputko@finejas.lt; kamile.silkaite@finejas.lt; mazena.podskorbis@finejas.lt; l.cernius@gby.lt; r.skrodenis@gby.lt; m.zeromskis@gby.lt; m.cernius@gby.lt; p.bulinskas@gby.lt; zygimantas.bertasius@manvesta.lt; dominykas.lizaitis@manvesta.lt; karolina.kasputyte@manvesta.lt; veslava.kviatkovska@manvesta.lt; vakaris.giedraitis@manvesta.lt; karolis.lamauskas@manvesta.lt; nauris.antanavicius@manvesta.lt; mantas.jakutis@ambercargo.lt; ana.jazovit@ambercargo.lt; dorota.mikutaviciene@ambercargo.lt',
+  'BRETANIA-DE':'l.cernius@gby.lt; m.zeromskis@gby.lt; zygimantas.bertasius@manvesta.lt; dominykas.lizaitis@manvesta.lt; ana.jazovit@ambercargo.lt; mantas.jakutis@ambercargo.lt; szymon.k@henzel.pl; henzel@dansped.eu; DBenz@haaf.de; MPorebska@haaf.de; nerijus@mdi.lt; logistics54@hoptrans.eu',
+  'BRETANIA-ALZACJA':'DBenz@haaf.de; MPorebska@haaf.de; paulina.szczepaniak@magtrans.eu; sebastian.slusarski@magtrans.eu; piotr.zygiel@magtrans.eu; maciej.kwiecien@magtrans.eu; kamil.hubner@magtrans.eu; rafal.rosik@magtrans.eu',
+  'BRETANIA-POLNOC':'jorune.gelezauskiene@finejas.lt; kamile.silkaite@finejas.lt; daniel.saputko@finejas.lt; swierad.d@chomar.pl; rychlik.k@chomar.pl; rudek.a@chomar.pl',
+  'PARYZ-BENELUX':'zygimantas.bertasius@manvesta.lt; dominykas.lizaitis@manvesta.lt; karolina.kasputyte@manvesta.lt; vakaris.giedraitis@manvesta.lt; karolis.lamauskas@manvesta.lt; g.vaikutis@transimeksa.com; ana.jazovit@ambercargo.lt; mantas.jakutis@ambercargo.lt; dorota.mikutaviciene@ambercargo.lt',
+  'PARYZ-DE':'oleksandr.skorodynskyi@oskargroup.com.pl; konradas@zaukostransportas.lt; zygimantas.bertasius@manvesta.lt; dominykas.lizaitis@manvesta.lt; szymon.k@henzel.pl; artur@henzel.pl; mantas.jakutis@ambercargo.lt; DBenz@haaf.de; logistics34@hoptrans.eu',
+  'PARYZ-ALZACJA':'mantas.jakutis@ambercargo.lt; ana.jazovit@ambercargo.lt; dorota.mikutaviciene@ambercargo.lt; m.zeromskis@gby.lt; l.cernius@gby.lt',
+  'ALZACJA-BENELUX':'anastasija.zhyhadlo@finejas.lt; laisvydas.smailys@finejas.lt; aivaras.mackevicius@bleiras.lt; evaldas.augustauskas@bleiras.lt; mantas.jakutis@ambercargo.lt; marek@henzel.pl',
+  'ALZACJA-DE':'aivaras.mackevicius@bleiras.lt; evaldas.augustauskas@bleiras.lt; dmitrij.prokopjev@bleiras.lt; swierad.d@chomar.pl; marek@henzel.pl; logistics81@hoptrans.eu',
+  'DE-FR':'service@janas-logistics.com; zbigniew.janas@janas-logistics.com; logistics27@hoptrans.eu; zygimantas@roslitauto.lt; eryk.t@henzel.pl'
+};
+var G3='agnieszka.posel@ctk-logistics.pl; ewelina.walerianczyk@ctk-logistics.pl; jakub.marzynski@ctk-logistics.pl; kamil.placzek@ctk-logistics.pl; szymon.adamek@ctk-logistics.pl; a.pajak@rudniccy-magetra.pl; aleksandra.wojtowicz@galaauto.pl; ireneusz.tulej@galaauto.pl; mcyran@spedpartner.pl; witrans.transport@gmail.com; agk@ntgroad.se; armand.aninoiu@cartrans.ro; cindy@devreese-logistic.be; france@devreese-logistic.be; jaunius@autokaravanas.lt; logistika@traig.si; luka.furlanic@eurotek.si; natalija.fliaum@tranita.lt; nijole.versalovic@rvtransport.lt; Sarune.Kepenyte@rvtlogistika.lt';
+
+// ═══ STATE ═══
+var scriptUrl='';var allLoads=[];var soldSet={};var sentSet={};var curSp='';var curDt='';
+var autoRefreshTimer=null;
+function lsGet(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function lKey(p){return p+'_'+curSp+'_'+curDt;}
+function saveAll(){
+  lsSet('r_sp',curSp);lsSet('r_dt',curDt);
+  lsSet(lKey('rl'),JSON.stringify(allLoads));
+  lsSet(lKey('rs'),JSON.stringify(soldSet));
+}
+function getCached(){try{var s=lsGet(lKey('rl'));return(s&&s!=='null')?JSON.parse(s):null;}catch(e){return null;}}
+function loadSold(){var s=lsGet(lKey('rs'));try{soldSet=(s&&s!=='null')?JSON.parse(s):{};}catch(e){soldSet={};}}
+function saveSold(){lsSet(lKey('rs'),JSON.stringify(soldSet));}
+function loadSent(){var s=lsGet(lKey('rse'));try{sentSet=(s&&s!=='null')?JSON.parse(s):{};}catch(e){sentSet={};}}
+function saveSent(){lsSet(lKey('rse'),JSON.stringify(sentSet));}
+function active(){return allLoads.filter(function(l){return!soldSet[l.nr];});}
+
+// ═══ URL ═══
+function saveUrl(){
+  var v=document.getElementById('urlIn').value.trim();
+  if(!v){alert('Wklej URL.');return;}
+  scriptUrl=v;lsSet('r_url',v);setConn(true);showToast('Połączono ✓');
+}
+function setConn(ok){
+  var bar=document.getElementById('cfgBar'),lbl=document.getElementById('cfgLbl'),inp=document.getElementById('urlIn'),btn=bar.querySelector('button');
+  if(ok){
+    bar.className='cfg-bar ok';lbl.textContent='POŁĄCZONO Z APPS SCRIPT';inp.style.display='none';
+    btn.textContent='Zmień URL';
+    btn.onclick=function(){bar.className='cfg-bar';lbl.textContent='APPS SCRIPT URL';inp.style.display='';btn.textContent='Połącz';btn.onclick=saveUrl;};
+  }
+}
+
+// ═══ DATE / SP CHANGE — wyczyść widok przy zmianie ═══
+function onDateChange(){
+  var newDt=document.getElementById('dPick').value;
+  if(newDt===curDt)return;
+  // Resetuj widok — nowe dane z Sheets wymagane
+  allLoads=[];soldSet={};
+  renderPool();
+  document.getElementById('eArea').innerHTML='<div class="empty-s"><div class="empty-icon">✉️</div><div class="empty-txt">Data zmieniona.<br>Kliknij "Załaduj z Sheets".</div></div>';
+  updateStat();
+  cancelNotifs();
+}
+function onSpChange(){
+  var newSp=document.getElementById('sPick').value;
+  if(newSp===curSp)return;
+  allLoads=[];soldSet={};
+  renderPool();
+  document.getElementById('eArea').innerHTML='<div class="empty-s"><div class="empty-icon">✉️</div><div class="empty-txt">Zmień spedytora i kliknij<br>"Załaduj z Sheets".</div></div>';
+  updateStat();
+}
+
+// ═══ SOLD ═══
+function toggleSold(nr){if(soldSet[nr])delete soldSet[nr];else soldSet[nr]=true;saveSold();renderPool();refresh();}
+
+// ═══ CLEAR CACHE ═══
+function clearCache(){
+  if(!curSp||!curDt){showToast('Najpierw załaduj dane.');return;}
+  if(!confirm('Wyczyścić pamięć dla '+curSp+' / '+curDt+'?\n\nŁadunki zostaną pobrane ponownie z Sheets.'))return;
+  lsSet(lKey('rl'),null);lsSet(lKey('rs'),null);
+  allLoads=[];soldSet={};
+  renderPool();
+  document.getElementById('eArea').innerHTML='<div class="empty-s"><div class="empty-icon">🗑️</div><div class="empty-txt">Cache wyczyszczony.<br>Kliknij "Załaduj z Sheets".</div></div>';
+  updateStat();
+  showToast('Cache wyczyszczony');
+}
+
+// ═══ PRICE ═══
+function calcPrice(l){
+  var s=parseFloat((l.srednia_stawka||'').replace(',','.'));
+  var k=parseFloat((l.km||'').replace(',','.'));
+  if(!s||!k||isNaN(s)||isNaN(k))return null;
+  return Math.round((s+0.05)*k);
+}
+
+// ═══ FORMAT ═══
+function pd(d){var m=String(d||'').match(/(\d{1,2})\.(\d{2})/);return m?m[1]+'.'+m[2]:d||'';}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;');}
+
+function mkWk(l){
+  var price=calcPrice(l);
+  var ps=price?(price+' EUR'):((l.cena||'')+' EUR');
+  if(l.wklejka&&l.wklejka.trim()&&price){
+    var lines=l.wklejka.trim().split('\n');
+    for(var i=lines.length-1;i>=0;i--){if(/\d+/.test(lines[i])&&/EUR|€/.test(lines[i])){lines[i]=ps;break;}}
+    return lines.join('\n');
+  }
+  var r=(l.kraj_zal||'')+' '+(l.kod_zal||'')+' - '+(l.kraj_rozl||'')+' '+(l.kod_rozl||'');
+  var f1=l.fix_zal&&l.fix_zal.trim()?' FIX':'',f2=l.fix_rozl&&l.fix_rozl.trim()?' FIX':'';
+  return[r.trim(),'Loading: '+pd(l.data_zal)+' '+(l.godz_zal||'')+f1,'Unloading: '+pd(l.data_rozl)+' '+(l.godz_rozl||'')+f2,'No exchange'+(l.towar?', '+l.towar:', general goods')+', '+(l.tony||'')+'T',ps].join('\n');
+}
+
+// Zwraca LISTĘ grup {key, emails, loads} — osobny mail dla każdej trasy
+function getTop20Groups(arr){
+  var routeLoads={};
+  arr.forEach(function(l){
+    var f=getFrom(l),t=getTo(l);
+    var fn=normalizeFromRegion(f);
+    if(!fn)return; // TROYES → tylko G3
+    var tn=isDE(t)?'DE':t;
+    var key=fn+'-'+tn;
+    // Fallback jeśli brak klucza
+    if(!TOP20[key]){
+      var fb=[fn+'-DE',fn+'-BENELUX','PARYZ-DE','PARYZ-BENELUX'];
+      for(var i=0;i<fb.length;i++){if(TOP20[fb[i]]){key=fb[i];break;}}
+    }
+    if(!TOP20[key])return;
+    if(!routeLoads[key])routeLoads[key]=[];
+    routeLoads[key].push(l);
+  });
+  var groups=[];
+  Object.keys(routeLoads).forEach(function(key){
+    groups.push({key:key,emails:TOP20[key],loads:routeLoads[key]});
+  });
+  // Posortuj wg klucza
+  groups.sort(function(a,b){return a.key>b.key?1:-1;});
+  return groups;
+}
+function isPL(e){return e.split(/[;,\s]+/).some(function(x){return x.trim().toLowerCase().endsWith('.pl');});}
+
+// Wyciąga imię z pierwszego adresu email: kamile.silkaite@... → "Kamile"
+function extractName(emailStr){
+  var first=emailStr.split(/[;,\s]+/).map(function(e){return e.trim();}).filter(Boolean)[0]||'';
+  var local=first.split('@')[0]||'';
+  var namePart=local.split('.')[0]||'';
+  // Tylko jeśli wygląda jak imię (min 3 litery, same litery)
+  if(namePart.length>=3&&/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+$/.test(namePart)){
+    return namePart.charAt(0).toUpperCase()+namePart.slice(1).toLowerCase();
+  }
+  return '';
+}
+
+// ═══ RENDER POOL ═══
+function renderPool(){
+  var el=document.getElementById('pArea'),cnt=document.getElementById('pCnt');
+  if(!allLoads.length){
+    el.innerHTML='<div class="empty-s"><div class="empty-icon">📦</div><div class="empty-txt">Brak ładunków<br>dla tego spedytora</div></div>';
+    cnt.style.display='none';return;
+  }
+  var av=active().length;
+  cnt.style.display='';cnt.textContent=av+' / '+allLoads.length;
+  el.innerHTML='';
+  allLoads.forEach(function(l,i){
+    var sold=soldSet[l.nr],from=getFrom(l),to=getTo(l),price=calcPrice(l);
+    var ps=price?(price+' EUR'):((l.cena||'')+' EUR');
+    var card=document.createElement('div');
+    card.className='lcard'+(sold?' sold':'');
+    card.style.animationDelay=(i*30)+'ms';
+    card.innerHTML='<div class="l-route">'+esc(l.kraj_zal)+' '+esc(l.kod_zal)+' → '+esc(l.kraj_rozl)+' '+esc(l.kod_rozl)+'</div>'+
+      '<div class="l-tags"><span class="tag tag-f">'+from+'</span><span class="tag tag-t">→ '+to+'</span></div>'+
+      '<div class="l-meta">'+pd(l.data_zal)+' '+esc(l.godz_zal)+'  ·  '+esc(l.klient)+'</div>'+
+      '<div class="l-price">'+ps+(l.tony?' · '+l.tony+'T':'')+'</div>'+
+      '<div class="l-act"><button class="sold-btn">'+(sold?'↩ cofnij':'✓ sprzedany')+'</button></div>';
+    card.querySelector('.sold-btn').addEventListener('click',function(){toggleSold(l.nr);});
+    el.appendChild(card);
+  });
+}
+
+// ═══ RENDER EMAILS ═══
+function refresh(){if(curSp&&allLoads.length)renderEmails(active(),curSp);}
+
+// Buduje blok przewoźnika z przyciskami kopiowania + oznaczenie wysłano
+function mkCarrierBlock(name,note,matchCount,emailVal,bodyVal,lang,time,subjectVal,sentKey){
+  var eId=sc(emailVal),bId=sc(bodyVal),sId=sc(subjectVal||'Ładunki');
+  var key=sentKey||('g1_'+name);
+  var isSent=!!sentSet[key];
+  var noteHtml=note?'<span class="cn-note">'+note+'</span>':'';
+  var langKey='lang_'+key;
+  var selectedLang=localStorage.getItem(langKey)||lang;
+  
+  return '<div class="cblock'+(isSent?' is-sent':'')+'" data-lang="'+selectedLang+'">'+
+    '<div class="ch"><span class="cn">'+esc(name)+noteHtml+
+      (matchCount?'<span class="cn-match">'+matchCount+' ład.</span>':'')+
+    '</span>'+
+    '<div class="ch-right">'+
+      '<div class="lang-toggle">'+
+        '<button class="lang-btn'+(selectedLang==='pl'?' active':'')+'" onclick="setLang(\''+esc(key)+'\',\'pl\')">PL</button>'+
+        '<button class="lang-btn'+(selectedLang==='en'?' active':'')+'" onclick="setLang(\''+esc(key)+'\',\'en\')">EN</button>'+
+      '</div>'+
+      '<span class="time-badge">'+time+'</span>'+
+      '<button class="sent-btn'+(isSent?' is-sent':'')+'" onclick="markSent(\''+esc(key)+'\')">'+( isSent?'✓ wysłano':'✉ wysłano?')+'</button>'+
+    '</div></div>'+
+    '<div class="cemail">'+esc(emailVal)+'</div>'+
+    '<div class="copy-row">'+
+      '<button class="cbtn" onclick="dc(\''+eId+'\')">⟨ Kopiuj adres</button>'+
+      '<button class="cbtn" onclick="dc(\''+bId+'\')">Kopiuj treść</button>'+
+      '<button class="cbtn send-btn" onclick="markSent(\''+esc(key)+'\');openOutlook(\''+eId+'\',\''+bId+'\',\''+sId+'\',false)">✉ Wyślij</button>'+
+    '</div>'+
+    '<div class="preview">'+esc(bodyVal)+'</div>'+
+  '</div>';
+}
+
+function renderEmails(arr,sp){
+  CS={};CI=0;
+  var el=document.getElementById('eArea');
+  if(!arr.length){el.innerHTML='<div class="all-sold">✓ Wszystkie ładunki sprzedane — Grupy 2 i 3 są puste</div>';return;}
+  var carriers=CARRIERS[sp]||[];
+
+  // G2: tylko ładunki FR z listą TOP20 (bez TROYES)
+  var arrG2=arr.filter(function(l){
+    return (l.kraj_zal||'').toUpperCase()==='FR' && normalizeFromRegion(getFrom(l))!==null;
+  });
+  // G3: tylko ładunki FR (wszystkie regiony łącznie z TROYES)
+  var arrG3=arr.filter(function(l){
+    return (l.kraj_zal||'').toUpperCase()==='FR';
+  });
+
+  var allWkG3=arrG3.map(mkWk).join('\n\n');
+  var html='';
+
+  // GRUPA 1 - zbierz wszystkie dopasowane przewoźniki i sprawdź czy wszystkie wysłane
+  var g1Matched=[];
+  var sortedCarriers=carriers.slice().sort(function(a,b){return(a.time||'99:99')>(b.time||'99:99')?1:-1;});
+  sortedCarriers.forEach(function(c){
+    var matched=arr.filter(function(l){return matchCarrier(l,c);});
+    if(matched.length){
+      g1Matched.push({carrier:c,loads:matched});
+    }
+  });
+  var g1AllSent=g1Matched.length>0 && g1Matched.every(function(m){return !!sentSet['g1_'+m.carrier.name];});
+  
+  html+='<div class="gc'+(g1AllSent?' is-sent':'')+'" style="animation-delay:0ms"><div class="gc-head"><span class="gc-badge g1b">GRUPA 1</span><span class="gc-title">Mailing bezpośredni</span><span class="gc-time">09:00 – 11:00</span></div><div class="gc-body">';
+  var g1any=false;
+  console.log('[RITEX] CARRIERS['+sp+'] count:',carriers.length);
+  carriers.forEach(function(c,i){console.log('[RITEX]  carrier['+i+']:',c.name,'fromR:',JSON.stringify(c.fromR),'toR:',JSON.stringify(c.toR),'fromDE:',!!c.fromDE_from);});
+  if(arr.length){var s=arr[0];console.log('[RITEX] load[0]:',{kraj_zal:s.kraj_zal,kod_zal:s.kod_zal,kraj_rozl:s.kraj_rozl,kod_rozl:s.kod_rozl,from:getFrom(s),to:getTo(s)});}
+  
+  g1Matched.forEach(function(m){
+    var c=m.carrier;
+    var matched=m.loads;
+    console.log('[RITEX] matchCarrier',c.name,'->',matched.length,'dopasowań');
+    g1any=true;
+    var sentKey='g1_'+c.name;
+    var langKey='lang_'+sentKey;
+    var storedLang=localStorage.getItem(langKey);
+    var pl=storedLang?storedLang==='pl':isPL(c.email);
+    var lang=pl?'pl':'en';
+    var wk=matched.map(mkWk).join('\n\n');
+    var name=extractName(c.email);
+    var greetPL=name?'Cześć '+name+',':'Cześć,';
+    var greetEN=name?'Hi '+name+',':'Hi,';
+    var body=pl
+      ?greetPL+'\n\nMam dla Ciebie ładunki na jutro, daj mi znać do 20 minut czy coś Ci pasuje — jeśli nie, uderzam dalej :)\n\n'+wk
+      :greetEN+'\n\nI have loads available for tomorrow. Let me know within 20 minutes if anything works for you — if not, I\'ll move on :)\n\n'+wk;
+    var dateLabel=curDt.split('-').slice(1).reverse().join('.');
+    var subjectG1=lang==='pl'
+      ?'Ładunki '+dateLabel+' — zarezerwowane dla Ciebie przez 20 minut'
+      :'Loads '+dateLabel+' — reserved for you for 20 minutes';
+    html+=mkCarrierBlock(c.name,c.note||'',matched.length,c.email,body,lang,c.time,subjectG1,'g1_'+c.name);
+  });
+  if(!g1any)html+='<div class="no-match">// Żaden ładunek nie pasuje do przewoźników Grupy 1 — wszystkie trafią do Grupy 2</div>';
+  html+='</div></div>';
+
+  // GRUPA 2 — osobny mail dla każdej trasy
+  if(arrG2.length){
+    var g2groups=getTop20Groups(arrG2);
+    g2groups.forEach(function(grp,idx){
+      var wkGrp=grp.loads.map(mkWk).join('\n\n');
+      var g2key='g2_'+grp.key;
+      var g2langKey='lang_'+g2key;
+      var storedG2Lang=localStorage.getItem(g2langKey);
+      var g2pl=storedG2Lang?storedG2Lang==='pl':isPL(grp.emails);
+      var g2lang=g2pl?'pl':'en';
+      var dateLabel2=curDt.split('-').slice(1).reverse().join('.');
+      var g2body=g2pl
+        ?'Cześć,\n\nPrzesyłamy pozostałe ładunki z wyższą stawką niż pojawi się na Timocomie :) Daj znać do 12:00 czy coś pasuje.\n\n'+wkGrp
+        :'Hi,\n\nWe\'re sharing the remaining loads with a bigger price than what will appear on Timocom later :) Let us know by 12:00 if anything works for you.\n\n'+wkGrp;
+      var g2subj=g2pl?'Ładunki '+dateLabel2+' — dla Ciebie do 12:00':'Loads '+dateLabel2+' — for you until 12:00';
+      var g2sent=!!sentSet[g2key];
+      var eId=sc(grp.emails),bId=sc(g2body),sId=sc(g2subj);
+
+      html+='<div class="gc'+(g2sent?' is-sent':'')+'" style="animation-delay:'+(60+idx*40)+'ms">' +
+        '<div class="gc-head"><span class="gc-badge g2b">GRUPA 2</span>'+
+        '<span class="gc-title">TOP 20 · '+esc(grp.key)+'</span>'+
+        '<div style="display:flex;align-items:center;gap:5px;margin-left:auto">'+
+          '<span style="font-size:10px;color:var(--ink3);font-family:var(--mono)">'+grp.loads.length+' ład.</span>'+
+          '<div class="lang-toggle">'+
+            '<button class="lang-btn'+(g2lang==='pl'?' active':'')+'" onclick="setLang(\''+esc(g2key)+'\',\'pl\')">PL</button>'+
+            '<button class="lang-btn'+(g2lang==='en'?' active':'')+'" onclick="setLang(\''+esc(g2key)+'\',\'en\')">EN</button>'+
+          '</div>'+
+          '<span class="gc-time">11:30 – 12:00</span>'+
+          '<button class="sent-btn'+(g2sent?' is-sent':'')+'" onclick="markSent(\''+esc(g2key)+'\')">'+( g2sent?'✓ wysłano':'✉ wysłano?')+'</button>'+
+        '</div></div>'+
+        '<div class="gc-body"><div class="cblock">'+
+          '<div class="cemail" style="max-height:80px;overflow-y:auto">'+esc(grp.emails)+'</div>'+
+          '<div class="copy-row">'+
+            '<button class="cbtn" onclick="dc(\''+eId+'\')">⟨ Kopiuj adresy</button>'+
+            '<button class="cbtn" onclick="dc(\''+bId+'\')">Kopiuj treść</button>'+
+            '<button class="cbtn send-btn" onclick="markSent(\''+esc(g2key)+'\');openOutlook(\''+eId+'\',\''+bId+'\',\''+sId+'\',true)">✉ Wyślij (BCC)</button>'+
+          '</div>'+
+          '<div class="preview">'+esc(g2body)+'</div>'+
+        '</div></div></div>';
+    });
+  }
+
+  // ETAP 3 — GRUPA 3 podzielona na podgrupy z harmonogramu
+  if(arrG3.length){
+    var g3subgroups=Array.isArray(G3)?G3:[{name:'Mailing rezerwowy',emails:G3,time:'12:00',lang:'en'}];
+    g3subgroups.forEach(function(sub,idx){
+      if(!sub.emails||!sub.emails.trim())return; // brak emaili — pomiń
+      var subKey='g3_'+sub.name;
+      var subLangKey='lang_'+subKey;
+      var storedSubLang=localStorage.getItem(subLangKey);
+      var subLang=storedSubLang||(sub.lang||'en');
+      var subTime=sub.time||'12:00';
+      var subSent=!!sentSet[subKey];
+      // Wybór treści wg języka
+      var deadline=subTime; // deadline = czas podgrupy
+      var subBody=subLang==='pl'
+        ?'Cześć,\n\nPrzesyłamy pozostałe ładunki z wyższą stawką niż pojawi się na Timocomie :) Daj znać czy coś pasuje.\n\n'+allWkG3
+        :'Hi,\n\nWe\'re sharing the remaining loads with a bigger price than what will appear on Timocom later :) Let us know if anything works for you.\n\n'+allWkG3;
+      var subSubj=subLang==='pl'
+        ?'Ładunki '+curDt.split('-').slice(1).reverse().join('.')+' — do '+subTime
+        :'Loads '+curDt.split('-').slice(1).reverse().join('.')+' — available until '+subTime;
+      var seId=sc(sub.emails),sbId=sc(subBody),ssId=sc(subSubj);
+
+      html+='<div class="gc'+(subSent?' is-sent':'')+'" style="animation-delay:'+(120+idx*40)+'ms">' +
+        '<div class="gc-head">'+
+          '<span class="gc-badge g3b">ETAP 3</span>'+
+          '<span class="gc-title">'+esc(sub.name)+'</span>'+
+          '<div style="display:flex;align-items:center;gap:5px;margin-left:auto">'+
+            '<div class="lang-toggle">'+
+              '<button class="lang-btn'+(subLang==='pl'?' active':'')+'" onclick="setLang(\''+esc(subKey)+'\',\'pl\')">PL</button>'+
+              '<button class="lang-btn'+(subLang==='en'?' active':'')+'" onclick="setLang(\''+esc(subKey)+'\',\'en\')">EN</button>'+
+            '</div>'+
+            '<span class="gc-time">'+subTime+'</span>'+
+            '<button class="sent-btn'+(subSent?' is-sent':'')+'" onclick="markSent(\''+esc(subKey)+'\')">'+( subSent?'✓ wysłano':'✉ wysłano?')+'</button>'+
+          '</div>'+
+        '</div>'+
+        '<div class="gc-body"><div class="cblock">'+
+          '<div class="cemail" style="max-height:80px;overflow-y:auto">'+esc(sub.emails)+'</div>'+
+          '<div class="copy-row">'+
+            '<button class="cbtn" onclick="dc(\''+seId+'\')">⟨ Kopiuj adresy</button>'+
+            '<button class="cbtn" onclick="dc(\''+sbId+'\')">Kopiuj treść</button>'+
+            '<button class="cbtn send-btn" onclick="markSent(\''+esc(subKey)+'\');openOutlook(\''+seId+'\',\''+sbId+'\',\''+ssId+'\',true)">✉ Wyślij (BCC)</button>'+
+          '</div>'+
+          '<div class="preview">'+esc(subBody)+'</div>'+
+        '</div></div></div>';
+    });
+  }
+
+  el.innerHTML=html;
+}
+
+// ═══ STAT ═══
+function updateStat(){
+  var s=document.getElementById('stat'),c=document.getElementById('clearBtn');
+  if(!allLoads.length){s.style.display='none';c.style.display='none';return;}
+  s.style.display='';c.style.display='';
+  s.innerHTML='<em>'+active().length+'</em> z '+allLoads.length+' · '+curSp+' · '+curDt;
+}
+
+// ═══ MAPOWANIE HARMONOGRAMU DO FORMATU APLIKACJI ═══
+function applyHarmonogram(data){
+  if(!data||!data.ok)return;
+
+  // Przewoźnicy — mapuj region i routing z harmonogramu
+  var ROUTE_MAP={
+    'bretania→alzacja→de': {fromR:['BRETANIA'],toDE_to:true,toR:['ALZACJA','DE']},
+    'bretania→de':        {fromR:['BRETANIA'],toDE_to:true,toR:['DE','ALZACJA']},
+    'bretania→be':        {fromR:['BRETANIA'],toR:['BENELUX','POLNOC']},
+    'bretania→benelux':   {fromR:['BRETANIA'],toR:['BENELUX','POLNOC']},
+    'bretania→polnoc':    {fromR:['BRETANIA'],toR:['POLNOC','BENELUX']},
+    'bretania→północ':   {fromR:['BRETANIA'],toR:['POLNOC','BENELUX']},
+    'bretania→alzacja':   {fromR:['BRETANIA'],toR:['ALZACJA']},
+    'bretania→fr':        {fromR:['BRETANIA'],toR:['BRETANIA','PARYZ','ALZACJA','NORMANDIA','SRODKOWA','POLNOC','LYON','LAZUROWE','BORDEAUX','NIEPRZYPISANA']},
+    'bretania→kabotaze':  {fromR:['BRETANIA'],toR:['BRETANIA','PARYZ','ALZACJA','NORMANDIA','SRODKOWA','POLNOC','LYON','LAZUROWE','BORDEAUX','NIEPRZYPISANA']},
+    'alzacja→be':         {fromR:['ALZACJA','LYON','LAZUROWE'],toR:['BENELUX']},
+    'paryz':              {fromR:['PARYZ','NORMANDIA','SRODKOWA','POLNOC'],toR:['*']},
+    'niemcy→fr':          {fromDE_from:true,toR:['FR-INNE','PARYZ','BRETANIA','ALZACJA','POLNOC','NORMANDIA','SRODKOWA','LYON','LAZUROWE','BORDEAUX']},
+    'de7':                {fromDE_from:true,toR:['*']},
+    'de01':               {fromDE_from:true,toR:['FR-INNE','PARYZ','BRETANIA']},
+    'fr':                 {fromR:['BRETANIA','PARYZ','ALZACJA','NORMANDIA','SRODKOWA','LYON','LAZUROWE','BORDEAUX','NIEPRZYPISANA'],toR:['*']}
+  };
+
+  function routeKey(routes){
+    var r=(routes||'').toLowerCase()
+      .replace(/ą/g,'a').replace(/ć/g,'c').replace(/ę/g,'e')
+      .replace(/ł/g,'l').replace(/ń/g,'n').replace(/ó/g,'o')
+      .replace(/ś/g,'s').replace(/ź/g,'z').replace(/ż/g,'z')
+      .replace(/\s/g,'')
+      .replace(/\//g,'→')
+      .replace(/->/g,'→')
+      .replace(/([a-zà-ž])-([a-zà-ž])/g,'$1→$2');
+    console.log('[RITEX] routeKey:',JSON.stringify(routes),'→',r);
+    for(var k in ROUTE_MAP){if(r.indexOf(k)>=0){console.log('[RITEX] matched:',k);return ROUTE_MAP[k];}}
+    console.log('[RITEX] no match — fallback toR:[*]');
+    return {fromR:['BRETANIA'],toR:['*']};
+  }
+
+  // JUMBO carriers
+  var JUMBO_NOTE=['marathon','logisticevex'];
+
+  ['EWA','KASIA','MAGDA','TOMEK'].forEach(function(sp){
+    var list=data.carriers[sp];
+    if(!list||!list.length)return;
+    CARRIERS[sp]=list.map(function(c){
+      var routing=routeKey(c.routes);
+      var isJumbo=JUMBO_NOTE.some(function(j){return c.name.toLowerCase().indexOf(j)>=0;});
+      var obj={name:c.name,email:c.emails,time:c.time||'09:00'};
+      Object.assign(obj,routing);
+      if(isJumbo){obj.note='JUMBO';obj.maxTon=22;}
+      if(c.note&&c.note.toLowerCase().indexOf('jumbo')>=0){obj.note='JUMBO';obj.maxTon=22;}
+      return obj;
+    });
+  });
+
+  // TOP20 — klucze z harmonogramu pasują do naszego formatu
+  if(data.top20&&Object.keys(data.top20).length){
+    Object.keys(data.top20).forEach(function(k){
+      // Harmonogram zwraca np. BRETANIA-BENELUX → pasuje do naszych kluczy
+      TOP20[k]=data.top20[k];
+    });
+  }
+
+  // G3
+  if(data.g3&&data.g3.length)G3=data.g3;
+
+  // MAPA REGIONÓW z zakładki "regiony" — zastępuje hardkodowane RM
+  if(data.regionMap&&Object.keys(data.regionMap).length>5){
+    // Normalizuj nazwy regionów z arkusza do naszego formatu
+    var REGION_NORM={
+      'BRETANIA GÓRNA':'BRETANIA','BRETANIA DOLNA':'BRETANIA','BRETANIA ŚRODKOWA':'BRETANIA',
+      'BREANIA ŚRODKOWA':'BRETANIA', // typo w arkuszu
+      'PARYŻ':'PARYZ','ALZACJA':'ALZACJA','PÓŁNOC':'POLNOC','POŁUDNIE DE':'POLUDNIE_DE',
+      'NORMANDIA':'NORMANDIA','ŚRODKOWA':'SRODKOWA','TROYES':'TROYES',
+      'LYON':'LYON','LAZUROWE':'LAZUROWE','BORDEAUX':'BORDEAUX',
+      'BRETANIA':'BRETANIA'
+    };
+    Object.keys(data.regionMap).forEach(function(code){
+      var raw=data.regionMap[code];
+      // Szukaj normalizacji
+      var norm=REGION_NORM[raw]||REGION_NORM[raw.toUpperCase()]||null;
+      if(!norm){
+        // Fallback: użyj bezpośrednio jeśli pasuje do znanych
+        var known=['BRETANIA','PARYZ','ALZACJA','POLNOC','NORMANDIA','SRODKOWA','TROYES','LYON','LAZUROWE','BORDEAUX'];
+        var up=raw.toUpperCase().replace(/Ą/g,'A').replace(/Ę/g,'E').replace(/Ó/g,'O').replace(/Ś/g,'S').replace(/Ź/g,'Z').replace(/Ż/g,'Z').replace(/Ł/g,'L').replace(/Ć/g,'C').replace(/Ń/g,'N');
+        if(known.indexOf(up)>=0)norm=up;
+        else norm=up; // użyj jak jest
+      }
+      RM[code]=norm;
+    });
+    console.log('[RITEX] Załadowano',Object.keys(data.regionMap).length,'kodów regionów z arkusza');
+  }
+}
+
+// ═══ LOAD ═══
+function doLoad(){
+  if(!scriptUrl){alert('Najpierw wklej URL Apps Script.');return;}
+  var sp=document.getElementById('sPick').value;
+  var dt=document.getElementById('dPick').value;
+  if(!sp){alert('Wybierz spedytora.');return;}
+  curSp=sp;curDt=dt;
+  var p=dt.split('-'),dStr=p[2]+'.'+p[1]+'.'+p[0].slice(2);
+  loadSold();loadSent();
+  var btn=document.getElementById('lBtn'),err=document.getElementById('errDiv');
+  btn.disabled=true;btn.innerHTML='<span class="spin"></span>Ładowanie harmonogramu...';
+  err.style.display='none';
+
+  // Krok 1: pobierz harmonogram
+  fetch(scriptUrl+'?type=harmonogram',{redirect:'follow'})
+    .then(function(r){return r.ok?r.json():Promise.resolve(null);})
+    .then(function(harm){
+      if(harm)applyHarmonogram(harm);
+      btn.innerHTML='<span class="spin"></span>Ładowanie ładunków...';
+      // Krok 2: pobierz ładunki
+      return fetch(scriptUrl+'?spedytor='+encodeURIComponent(sp)+'&data='+encodeURIComponent(dStr),{redirect:'follow'});
+    })
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+    .then(function(j){
+      if(!j.ok)throw new Error(j.error||'Błąd skryptu');
+      allLoads=j.loads||[];
+      saveAll();renderPool();
+      if(allLoads.length)refresh();
+      else document.getElementById('eArea').innerHTML='<div class="empty-s"><div class="empty-icon">🔍</div><div class="empty-txt">Brak dostępnych ładunków<br>dla '+sp+' na '+dStr+'</div></div>';
+      updateStat();
+      showToast('Załadowano '+allLoads.length+' ładunków');
+      startAutoRefresh();
+      if('Notification' in window && Notification.permission==='granted'){scheduleNotifs();}
+      var ind=document.getElementById('autoInd');if(ind){ind.style.display='';ind.textContent='↻ auto-sync 10min';}
+    })
+    .catch(function(e){err.textContent='Błąd: '+e.message;err.style.display='block';})
+    .finally(function(){btn.disabled=false;btn.innerHTML='↓ Załaduj z Sheets';});
+}
+
+// ═══ TOAST ═══
+function showToast(msg){
+  var t=document.getElementById('toast');t.textContent='✓ '+msg;
+  t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on');},2000);
+}
+
+// ═══ AUTO-REFRESH (co 10 min) ═══
+function startAutoRefresh(){
+  if(autoRefreshTimer)clearInterval(autoRefreshTimer);
+  autoRefreshTimer=setInterval(function(){
+    if(!scriptUrl||!curSp||!curDt)return;
+    silentRefresh();
+  },10*60*1000);
+}
+function silentRefresh(){
+  var p=curDt.split('-'),dStr=p[2]+'.'+p[1]+'.'+p[0].slice(2);
+  var ind=document.getElementById('autoInd');
+  if(ind){ind.textContent='↻ odświeżam...';ind.style.opacity='1';}
+  fetch(scriptUrl+'?type=harmonogram',{redirect:'follow'})
+    .then(function(r){return r.ok?r.json():Promise.resolve(null);})
+    .then(function(harm){
+      if(harm)applyHarmonogram(harm);
+      return fetch(scriptUrl+'?spedytor='+encodeURIComponent(curSp)+'&data='+encodeURIComponent(dStr),{redirect:'follow'});
+    })
+    .then(function(r){return r.ok?r.json():null;})
+    .then(function(j){
+      if(j&&j.ok){allLoads=j.loads||[];saveAll();renderPool();if(allLoads.length)refresh();updateStat();}
+      var now=new Date();var hm=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+      if(ind){ind.textContent='↻ '+hm;setTimeout(function(){ind.style.opacity='0.5';},3000);}
+    })
+    .catch(function(){if(ind){ind.textContent='↻ błąd';ind.style.opacity='0.5';}});
+}
+
+// ═══ WYSŁANO / TIMER ═══
+function setLang(key,lang){
+  localStorage.setItem('lang_'+key,lang);
+  refresh();
+}
+
+function markSent(key){
+  if(sentSet[key]){delete sentSet[key];}
+  else{sentSet[key]=Date.now();}
+  saveSent();refresh();
+}
+
+
+
+
+// ═══ POWIADOMIENIA PUSH ═══
+var notifScheduled = [];  // lista setTimeout IDs do czyszczenia
+
+function toggleNotif(){
+  if(!('Notification' in window)){showToast('Twoja przeglądarka nie obsługuje powiadomień');return;}
+  if(Notification.permission==='denied'){
+    showToast('Powiadomienia zablokowane — odblokuj w ustawieniach przeglądarki');
+    return;
+  }
+  if(Notification.permission==='granted'){
+    // Wyłącz — wyczyść zaplanowane
+    cancelNotifs();
+    updateNotifBtn(false);
+    showToast('Powiadomienia wyłączone');
+    return;
+  }
+  // Poproś o zgodę
+  Notification.requestPermission().then(function(perm){
+    if(perm==='granted'){
+      updateNotifBtn(true);
+      scheduleNotifs();
+      showToast('Powiadomienia włączone ✓');
+    } else {
+      updateNotifBtn(false);
+      showToast('Brak zgody na powiadomienia');
+    }
+  });
+}
+
+function updateNotifBtn(on){
+  var btn=document.getElementById('notifBtn');
+  if(!btn)return;
+  if(Notification.permission==='denied'){btn.className='notif-btn denied';btn.textContent='🔕 Zablokowane';return;}
+  btn.className='notif-btn'+(on?' active':'');
+  btn.textContent=on?'🔔 Powiadomienia ON':'🔔 Powiadomienia';
+}
+
+function pushNotif(title, body, tag){
+  if(Notification.permission!=='granted')return;
+  var n=new Notification(title,{
+    body: body,
+    tag:  tag||'ritex',
+    icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="%230f766e"/><text x="16" y="22" font-size="18" text-anchor="middle" fill="white">✉</text></svg>'
+  });
+  // Kliknięcie w powiadomienie — focus na okno
+  n.onclick=function(){window.focus();n.close();};
+  setTimeout(function(){n.close();},10000);
+}
+
+function cancelNotifs(){
+  notifScheduled.forEach(function(id){clearTimeout(id);});
+  notifScheduled=[];
+}
+
+// Główna funkcja — planuje wszystkie powiadomienia na dziś
+function scheduleNotifs(){
+  if(Notification.permission!=='granted')return;
+  cancelNotifs();
+  var carriers=CARRIERS[curSp]||[];
+  var dateStr=curDt; // YYYY-MM-DD
+  if(!dateStr)return;
+
+  // Pomocnik: zamień "HH:MM" na ms do tej chwili (dziś lub jutro)
+  function msUntil(timeStr){
+    var parts=timeStr.split(':');
+    var h=parseInt(parts[0])||0, m=parseInt(parts[1])||0;
+    var now=new Date();
+    var target=new Date(now);
+    target.setHours(h,m,0,0);
+    // Jeśli data załadunku to jutro, planujemy na jutro
+    var loadDate=new Date(dateStr+'T00:00:00');
+    var today=new Date();today.setHours(0,0,0,0);
+    if(loadDate>today){
+      // Jutrzejsza data — planuj na jutro
+      target.setDate(target.getDate()+1);
+      target.setHours(h,m,0,0);
+    }
+    var diff=target-now;
+    return diff; // może być ujemne (czas minął)
+  }
+
+  var dateLabel=curDt.split('-').slice(1).reverse().join('.');
+
+  // ── G1: powiadomienie per przewoźnik ──
+  var sorted=carriers.slice().sort(function(a,b){return(a.time||'99:99')>(b.time||'99:99')?1:-1;});
+  sorted.forEach(function(c){
+    var ms=msUntil(c.time||'09:00');
+    if(ms<-60000)return; // ponad minutę za późno — pomiń
+    if(ms<0)ms=0;
+    var id=setTimeout(function(){
+      if(sentSet['g1_'+c.name])return; // już wysłano — pomiń
+      pushNotif(
+        '📨 Czas na '+c.name,
+        'G1 · '+dateLabel+' · wyślij teraz ('+( c.time||'09:00')+')',
+        'g1_'+c.name
+      );
+    },ms);
+    notifScheduled.push(id);
+  });
+
+  // ── G2: 11:30 ──
+  var msG2=msUntil('11:30');
+  if(msG2>=-60000){
+    var id2=setTimeout(function(){
+      pushNotif('📨 Czas na Grupę 2 (TOP 20)','Wyślij maile do TOP 20 · '+dateLabel,'g2');
+    },Math.max(0,msG2));
+    notifScheduled.push(id2);
+  }
+
+  // ── ETAP 3: podgrupy z harmonogramu ──
+  var g3list=Array.isArray(G3)?G3:[];
+  g3list.forEach(function(sub){
+    if(!sub.time||!sub.emails)return;
+    var ms3=msUntil(sub.time);
+    if(ms3<-60000)return;
+    var key3='g3_'+sub.name;
+    var id3=setTimeout(function(){
+      if(sentSet[key3])return;
+      pushNotif(
+        '📨 Czas na ETAP 3 · '+sub.name,
+        sub.time+' · '+dateLabel,
+        key3
+      );
+    },Math.max(0,ms3));
+    notifScheduled.push(id3);
+  });
+
+  // Jeśli G3 to stary string — jedno powiadomienie o 12:00
+  if(!Array.isArray(G3)&&G3){
+    var msG3=msUntil('12:00');
+    if(msG3>=-60000){
+      var id3f=setTimeout(function(){
+        pushNotif('📨 Czas na Etap 3','Mailing rezerwowy · '+dateLabel,'g3_flat');
+      },Math.max(0,msG3));
+      notifScheduled.push(id3f);
+    }
+  }
+
+  var total=notifScheduled.length;
+  showToast('Zaplanowano '+total+' powiadomień na '+dateLabel);
+}
+
+// ═══ INIT ═══
+(function(){
+  var d=new Date();d.setDate(d.getDate()+1);
+  var def=d.toISOString().slice(0,10);
+  var url=lsGet('r_url');if(url){scriptUrl=url;document.getElementById('urlIn').value=url;setConn(true);}
+  var sp=lsGet('r_sp')||'',dt=lsGet('r_dt')||def;
+  if(sp)document.getElementById('sPick').value=sp;
+  document.getElementById('dPick').value=dt;
+  // Powiadomienia — przywróć stan przycisku
+  if('Notification' in window && Notification.permission==='granted'){
+    updateNotifBtn(true);
+  } else if('Notification' in window && Notification.permission==='denied'){
+    updateNotifBtn(false);
+  }
+
+  if(sp&&dt){
+    curSp=sp;curDt=dt;
+    loadSold();loadSent();
+    var cached=getCached();
+    if(cached&&cached.length){allLoads=cached;renderPool();refresh();updateStat();}
+  }
+})();
+</script>
+</body>
+</html>
